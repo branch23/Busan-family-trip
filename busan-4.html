@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>釜山旅遊＋預算記帳</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Segoe UI",sans-serif;background:linear-gradient(135deg,#dff4ff,#fff7ed);color:#172033;line-height:1.6}
+    button,input,select,textarea{font:inherit}
+    a{text-decoration:none;color:inherit}
+    .container{max-width:1120px;margin:auto;padding:18px 14px 70px}
+    .hero{min-height:330px;background:linear-gradient(rgba(15,23,42,.2),rgba(15,23,42,.65)),url("https://images.unsplash.com/photo-1601621915196-2621bfb0cd6e?auto=format&fit=crop&w=1600&q=80");background-size:cover;background-position:center;border-radius:28px;padding:28px;color:white;display:flex;flex-direction:column;justify-content:flex-end;margin-bottom:14px;box-shadow:0 20px 50px rgba(15,23,42,.22)}
+    .hero h1{font-size:clamp(34px,7vw,64px);line-height:1.05}.tag{display:inline-block;width:max-content;background:rgba(255,255,255,.22);padding:8px 14px;border-radius:999px;font-weight:900;margin-bottom:10px}
+    .nav{position:sticky;top:0;z-index:10;display:flex;gap:8px;overflow-x:auto;padding:10px 0 14px;backdrop-filter:blur(12px)}
+    .nav a{white-space:nowrap;background:rgba(255,255,255,.9);padding:8px 12px;border-radius:999px;font-size:13px;font-weight:900;box-shadow:0 8px 20px rgba(0,0,0,.06)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+    .card,.day-card,.spot,.expense-row{background:rgba(255,255,255,0.75);border:1px solid rgba(255,255,255,0.6);border-radius:20px;padding:16px;box-shadow:0 12px 30px rgba(15,23,42,.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+    #converter{position:relative;overflow:hidden;background:linear-gradient(135deg, rgba(255,255,255,0.62), rgba(255,255,255,0.28));border:1px solid rgba(255,255,255,0.78);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);box-shadow:0 20px 45px rgba(15,23,42,0.12),inset 0 1px 0 rgba(255,255,255,0.75)}
+    #converter::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top left, rgba(255,255,255,0.75), transparent 45%);pointer-events:none}
+    #converter > *{position:relative;z-index:1}
+    .section-title{font-size:28px;margin:26px 0 12px;color:#0f172a}.muted{color:#64748b;font-size:14px}.guide-line{font-size:13px;color:#475569;margin-top:3px}
+    .budget-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px}.summary-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:12px}.summary-box b{font-size:20px}
+    .field label{display:block;font-size:12px;font-weight:900;color:#475569;margin-bottom:4px}.field input,.field select,.field textarea{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:9px;background:white}
+    .btn{border:0;border-radius:12px;padding:10px 13px;font-weight:950;cursor:pointer;display:inline-block}.primary{background:#0f172a;color:white}.green{background:#16a34a;color:white}.red{background:#fee2e2;color:#b91c1c}.blue{background:#e0f2fe;color:#075985}
+    .day-card{position:relative;margin-bottom:16px}.day-card:before{content:"";position:absolute;left:0;top:0;width:7px;height:100%;background:linear-gradient(#38bdf8,#fb923c);border-radius:20px 0 0 20px}.day-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:12px;padding-left:6px}.date{background:#eff6ff;color:#2563eb;border-radius:999px;padding:5px 10px;font-size:13px;font-weight:900;height:max-content}.spots{display:grid;gap:10px}.spot{display:grid;grid-template-columns:52px 1fr;gap:11px;background:#f8fafc;position:relative}.icon{width:48px;height:48px;border-radius:14px;background:white;display:grid;place-items:center;font-size:25px}.time{font-size:14px;color:#0284c7;font-weight:900}.drive{font-size:13px;color:#334155;font-weight:900;background:#e0f2fe;border:1px solid #bae6fd;border-radius:999px;padding:4px 9px;display:inline-block;margin:6px 0}.place{font-size:17px;font-weight:950;padding-right:30px}.badge-row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.badge{font-size:12px;font-weight:900;padding:4px 8px;border-radius:999px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}.easy{background:#ecfdf5;color:#047857;border-color:#bbf7d0}.walk{background:#fef2f2;color:#b91c1c;border-color:#fecaca}.reserve{background:#eef2ff;color:#4338ca;border-color:#c7d2fe}.map{display:flex;gap:6px;flex-wrap:wrap}.map a{font-size:12px;background:#0f172a;color:white;border-radius:10px;padding:6px 9px;font-weight:900}.map a:last-child{background:#16a34a}.delete{position:absolute;right:8px;top:8px;border:0;border-radius:999px;width:28px;height:28px;background:#fee2e2;color:#b91c1c;font-weight:950}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.expense-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px;background:#f8fafc}
+    .bottom-bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:calc(100% - 28px);max-width:520px;background:rgba(15,23,42,.92);backdrop-filter:blur(14px);border-radius:24px;padding:9px;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;z-index:30;box-shadow:0 18px 45px rgba(15,23,42,.35)}.bottom-bar a,.bottom-bar button{border:0;background:transparent;color:white;border-radius:16px;padding:8px 4px;font-size:12px;font-weight:900;text-align:center}.fab{position:fixed;right:18px;bottom:94px;width:60px;height:60px;border:0;border-radius:22px;background:#0f172a;color:white;font-size:30px;font-weight:900;z-index:31;box-shadow:0 18px 38px rgba(15,23,42,.35)}.sheet-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:40;display:none}.sheet-backdrop.show{display:block}.sheet{position:fixed;left:50%;bottom:-100%;transform:translateX(-50%);width:100%;max-width:560px;background:white;border-radius:28px 28px 0 0;padding:18px;z-index:41;box-shadow:0 -20px 50px rgba(15,23,42,.25);transition:.25s ease;max-height:82vh;overflow:auto}.sheet.show{bottom:0}.sheet-handle{width:48px;height:5px;background:#cbd5e1;border-radius:999px;margin:0 auto 14px}.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}.quick-actions button{border:0;border-radius:18px;padding:16px 10px;font-weight:950;background:#f1f5f9;color:#0f172a}.quick-actions button.active{background:#0f172a;color:white}.sheet-section{display:none}.sheet-section.active{display:block}.app-spacer{height:96px}
+    @media(max-width:700px){.hero{min-height:280px}.day-head{display:block}.date{display:inline-block;margin-top:6px}.spot{grid-template-columns:46px 1fr}.icon{width:42px;height:42px}.grid{grid-template-columns:1fr}.expense-row{align-items:flex-start;flex-direction:column}}
+    @media(min-width:701px){.bottom-bar,.fab{display:none}.app-spacer{height:0}}
+  </style>
+</head>
+<body>
+<main class="container">
+  <section class="hero"><div class="tag">🇰🇷 Busan Family Trip</div><h1>釜山5天4夜<br>家庭旅遊＋預算記帳</h1><p>8/7–8/12｜行程、地圖、家庭友善標籤、即時花費記帳整合版</p></section>
+  <nav class="nav"><a href="#budget">預算</a><a href="#converter">換算器</a><a href="#addExpense">新增花費</a><a href="#day0">Day0</a><a href="#day1">Day1</a><a href="#day2">Day2</a><a href="#day3">Day3</a><a href="#day4">Day4</a><a href="#day5">Day5</a><a href="#addTrip">新增行程</a></nav>
+
+  <section class="card" id="budget">
+    <h2>💰 預算總覽</h2>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>匯率：1 KRW = 幾 NTD</label><input id="rate" type="number" value="0.025" step="0.001"></div>
+      <div class="field"><label>人數</label><input id="people" type="number" value="8"></div>
+      <div class="field"><label>住宿預算 NTD</label><input class="budgetInput" id="hotelBudget" type="number" value="0"></div>
+      <div class="field"><label>餐飲預算 NTD</label><input class="budgetInput" id="foodBudget" type="number" value="0"></div>
+      <div class="field"><label>交通預算 NTD</label><input class="budgetInput" id="transportBudget" type="number" value="0"></div>
+      <div class="field"><label>門票預算 NTD</label><input class="budgetInput" id="ticketBudget" type="number" value="0"></div>
+      <div class="field"><label>購物預算 NTD</label><input class="budgetInput" id="shoppingBudget" type="number" value="0"></div>
+    </div>
+    <div class="budget-summary">
+      <div class="summary-box">總預算<br><b id="totalBudget">0</b> NTD<br><span id="totalBudgetKrw" class="muted"></span></div>
+      <div class="summary-box">已花費<br><b id="actualTotal">0</b> NTD<br><span id="actualTotalKrw" class="muted"></span></div>
+      <div class="summary-box">剩餘<br><b id="remaining">0</b> NTD<br><span id="remainingKrw" class="muted"></span></div>
+      <div class="summary-box">平均每人<br><b id="perPerson">0</b> NTD<br><span id="perPersonKrw" class="muted"></span></div>
+    </div>
+    <p class="muted" style="margin-top:10px">目前匯率：<span id="rateText">0.025</span></p>
+  </section>
+
+  <div class="grid" style="margin-top:16px">
+    <section class="card" id="converter">
+      <h2>💱 韓幣 / 台幣 即時換算器</h2>
+      <p class="muted">輸入任一金額，自動換算（使用上方匯率）</p>
+      <div class="grid" style="margin-top:12px">
+        <div class="field"><label>韓元 KRW</label><input id="krwInput" type="number" placeholder="輸入韓元"></div>
+        <div class="field"><label>台幣 NTD</label><input id="ntdInput" type="number" placeholder="輸入台幣"></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" id="addExpense">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <input id="saveName" placeholder="新存檔名稱（例如 Day1版）" style="flex:1;border:1px solid #ccc;border-radius:10px;padding:6px">
+      <select id="profileSelect" style="flex:1;border:1px solid #ccc;border-radius:10px;padding:6px"><option value="">選擇已有存檔</option></select>
+      <button class="btn green" type="button" id="saveProfileBtn">💾 存檔</button>
+      <button class="btn blue" type="button" id="loadProfileBtn">📂 載入</button>
+      <button class="btn red" type="button" id="deleteProfileBtn">🗑️ 刪除</button>
+    </div>
+    <h2>🧾 旅途中新增花費</h2>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>日期</label><select id="expenseDay"><option value="day0">Day0</option><option value="day1">Day1</option><option value="day2">Day2</option><option value="day3">Day3</option><option value="day4">Day4</option><option value="day5">Day5</option></select></div>
+      <div class="field"><label>成員</label><select id="expenseMember"><option value="">選擇成員</option></select></div>
+      <div class="field"><label>分類</label><select id="expenseCategory"><option>餐飲</option><option>交通</option><option>門票</option><option>購物</option><option>住宿</option><option>其他</option></select></div>
+      <div class="field"><label>項目</label><input id="expenseName" placeholder="例：咖啡、計程車、門票"></div>
+      <div class="field"><label>幣別</label><select id="expenseCurrency"><option value="KRW">韓元 KRW</option><option value="NTD">台幣 NTD</option></select></div>
+      <div class="field"><label>金額</label><input id="expenseAmount" type="number" placeholder="可輸入韓元或台幣"></div>
+    </div>
+    <div class="actions"><button class="btn primary" type="button" id="addExpenseBtn">➕ 新增花費</button><button class="btn red" type="button" id="resetExpensesBtn">清空花費</button></div>
+    <div id="dailySummary" class="budget-summary"></div>
+    <div class="section-title" style="font-size:20px;margin-top:14px">📊 花費分類統計</div><div id="categoryStats" class="budget-summary"></div>
+    <div class="section-title" style="font-size:20px;margin-top:14px">👤 成員花費統計</div><div id="memberStats" class="budget-summary"></div>
+    <div id="expenseList"></div>
+  </section>
+
+  <h2 class="section-title">每日行程</h2>
+  <section id="timeline"></section>
+
+  <section class="card" id="addTrip">
+    <h2>＋ 新增行程卡片</h2>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>Day</label><select id="tripDay"><option value="day0">Day0</option><option value="day1">Day1</option><option value="day2">Day2</option><option value="day3">Day3</option><option value="day4">Day4</option><option value="day5">Day5</option></select></div>
+      <div class="field"><label>Icon</label><input id="tripIcon" value="📍"></div>
+      <div class="field"><label>時間</label><input id="tripTime" placeholder="例：21:00"></div>
+      <div class="field"><label>景點 / 餐廳</label><input id="tripPlace" placeholder="例：松亭三代豬肉湯飯"></div>
+      <div class="field"><label>車程時間</label><input id="tripDrive" placeholder="例：約 20 分鐘"></div>
+      <div class="field"><label>地圖搜尋關鍵字</label><input id="tripQuery" placeholder="不填則用景點名稱"></div>
+      <div class="field"><label>家庭標籤</label><select id="tripBadge"><option value="easy">👶 長輩OK</option><option value="walk">🚶‍♂️ 需走路</option><option value="reserve">📌 需預約</option></select></div>
+    </div>
+    <div class="field" style="margin-top:10px"><label>描述</label><textarea id="tripDesc" rows="2"></textarea></div>
+    <div class="grid" style="margin-top:10px">
+      <div class="field"><label>⭐ 推薦指數</label><input id="tripRating" placeholder="例：⭐⭐⭐⭐☆"></div>
+      <div class="field"><label>📸 拍照重點</label><input id="tripPhoto" placeholder="例：海邊日落"></div>
+      <div class="field"><label>🍽️ 必吃推薦</label><input id="tripFood" placeholder="例：炸雞"></div>
+      <div class="field"><label>⚠️ 注意事項</label><input id="tripTip" placeholder="例：需排隊"></div>
+    </div>
+    <div class="actions"><button class="btn primary" type="button" id="addTripBtn">新增行程</button><button class="btn blue" type="button" id="exportBtn">匯出目前 HTML</button><button class="btn red" type="button" id="resetAllBtn">恢復原始版本</button></div>
+  </section>
+
+  <div class="app-spacer"></div>
+</main>
+
+<button class="fab" type="button" id="fabBtn">＋</button>
+<div class="bottom-bar">
+  <a href="#budget">💰<br>預算</a>
+  <a href="#timeline">📅<br>行程</a>
+  <button type="button" id="bottomExpenseBtn">🧾<br>花費</button>
+  <button type="button" id="bottomTripBtn">＋<br>新增</button>
+</div>
+
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<section class="sheet" id="appSheet">
+  <div class="sheet-handle"></div>
+  <div class="quick-actions"><button type="button" id="expenseTab">🧾 新增花費</button><button type="button" id="tripTab">📍 新增行程</button></div>
+  <div class="sheet-section" id="expenseSheet">
+    <h2>快速新增花費</h2>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>日期</label><select id="mExpenseDay"><option value="day0">Day0</option><option value="day1">Day1</option><option value="day2">Day2</option><option value="day3">Day3</option><option value="day4">Day4</option><option value="day5">Day5</option></select></div>
+      <div class="field"><label>成員</label><select id="mExpenseMember"><option value="">選擇成員</option></select></div>
+      <div class="field"><label>分類</label><select id="mExpenseCategory"><option>餐飲</option><option>交通</option><option>門票</option><option>購物</option><option>住宿</option><option>其他</option></select></div>
+      <div class="field"><label>項目</label><input id="mExpenseName" placeholder="例：咖啡、計程車"></div>
+      <div class="field"><label>幣別</label><select id="mExpenseCurrency"><option value="KRW">韓元 KRW</option><option value="NTD">台幣 NTD</option></select></div>
+      <div class="field"><label>金額</label><input id="mExpenseAmount" type="number" placeholder="輸入金額"></div>
+    </div>
+    <div class="actions"><button class="btn primary" type="button" id="addMobileExpenseBtn">新增花費</button><button class="btn blue" type="button" id="closeSheetBtn1">關閉</button></div>
+  </div>
+  <div class="sheet-section" id="tripSheet">
+    <h2>快速新增行程</h2>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>Day</label><select id="mTripDay"><option value="day0">Day0</option><option value="day1">Day1</option><option value="day2">Day2</option><option value="day3">Day3</option><option value="day4">Day4</option><option value="day5">Day5</option></select></div>
+      <div class="field"><label>Icon</label><input id="mTripIcon" value="📍"></div>
+      <div class="field"><label>時間</label><input id="mTripTime" placeholder="例：21:00"></div>
+      <div class="field"><label>景點 / 餐廳</label><input id="mTripPlace" placeholder="例：咖啡廳"></div>
+      <div class="field"><label>車程時間</label><input id="mTripDrive" placeholder="例：約 20 分鐘"></div>
+      <div class="field"><label>地圖關鍵字</label><input id="mTripQuery" placeholder="不填則用景點名稱"></div>
+      <div class="field"><label>家庭標籤</label><select id="mTripBadge"><option value="easy">👶 長輩OK</option><option value="walk">🚶‍♂️ 需走路</option><option value="reserve">📌 需預約</option></select></div>
+    </div>
+    <div class="field" style="margin-top:10px"><label>描述</label><textarea id="mTripDesc" rows="2"></textarea></div>
+    <div class="actions"><button class="btn primary" type="button" id="addMobileTripBtn">新增行程</button><button class="btn blue" type="button" id="closeSheetBtn2">關閉</button></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  'use strict';
+  const DAY_INFO={day0:['Day0｜8/7 抵達釜山・入住西面','8/7'],day1:['Day1｜8/8 南浦＋廣安里無人機＋遊艇','8/8'],day2:['Day2｜8/9 慶州一日遊','8/9'],day3:['Day3｜8/10 甘川洞＋THE SKY＋換飯店','8/10'],day4:['Day4｜8/11 海雲台＋膠囊列車','8/11'],day5:['Day5｜8/12 回程','8/12']};
+  const DEFAULT_MEMBERS=['春金','佩璉','肖慧','南燕','勇龍','瑩庭','姿榕','承學'];
+  const BASE_ITEMS=[
+    {day:'day0',icon:'✈️',time:'19:00',place:'金海機場抵達',drive:'機場 → 西面：約 35–50 分鐘',desc:'釜山主要國際機場，入境後交通方便，前往市區很順。',rating:'⭐⭐⭐⭐',photo:'入境大廳、飛機窗景',food:'機場咖啡、輕食',tip:'入境可能排隊，預留時間',badge:'easy',query:'Gimhae International Airport'},
+    {day:'day0',icon:'🏨',time:'20:00',place:'西面阿班飯店 Check-in',drive:'飯店 → 湯飯：約 5–10 分鐘',desc:'西面是釜山最熱鬧商圈之一，吃喝購物都集中。',rating:'⭐⭐⭐⭐⭐',photo:'飯店大廳、街景夜拍',food:'附近便利商店、宵夜',tip:'熱門地段，晚上人多',badge:'easy',query:'Arban Hotel Busan'},
+    {day:'day0',icon:'🍜',time:'21:00',place:'松亭三代豬肉湯飯',desc:'釜山代表美食，熱湯＋白飯很適合第一天暖胃。',rating:'⭐⭐⭐⭐⭐',photo:'湯飯特寫',food:'豬肉湯飯、泡菜',tip:'晚餐尖峰需排隊',badge:'easy',query:'Songjeong 3dae Gukbap Busan'},
+    {day:'day1',icon:'☕',time:'09:30–10:30',place:'ALL SUNDAY 西面早餐',drive:'西面 → 南浦：約 25–35 分鐘',desc:'人氣早午餐店，適合悠閒開啟旅程。',rating:'⭐⭐⭐⭐',photo:'早午餐擺盤＋窗邊自然光',food:'法式吐司、咖啡',tip:'假日人多，建議 9 點前到',badge:'easy',query:'ALL SUNDAY Seomyeon Busan'},
+    {day:'day1',icon:'🛍️',time:'11:00–15:30',place:'南浦洞｜BIFF、札嘎其市場、國際市場',desc:'釜山最經典觀光區，結合市場、小吃與購物街。',rating:'⭐⭐⭐⭐⭐',photo:'BIFF地標、魚市場活海鮮',food:'糖餅、魚糕、海鮮拼盤',tip:'人潮非常多＋需走路，穿好走鞋',badge:'walk',query:'BIFF Square Jagalchi Market Gukje Market Busan'},
+    {day:'day1',icon:'☕',time:'15:30–16:30',place:'Ryui’s Coffee Bar / Cafe Nampo Yunseul',desc:'南浦人氣咖啡廳，適合休息放鬆補體力。',rating:'⭐⭐⭐⭐',photo:'窗景咖啡＋街景',food:'手沖咖啡、甜點',tip:'熱門時段需候位',badge:'easy',query:'Ryui Coffee Bar Busan'},
+    {day:'day1',icon:'🏖️',time:'17:00',place:'廣安里海灘＋炸雞晚餐',drive:'南浦 → 廣安里：約 35–50 分鐘',desc:'可以看到廣安大橋，傍晚夕陽＋夜景超美。',rating:'⭐⭐⭐⭐⭐',photo:'夕陽＋廣安大橋夜景',food:'韓式炸雞＋啤酒',tip:'傍晚人潮爆多，建議提早卡位',badge:'easy',query:'Gwangalli Beach Busan'},
+    {day:'day1',icon:'⛵',time:'19:30–20:30',place:'Yachtholic 遊艇＋無人機＋煙火',desc:'釜山最熱門夜間活動之一，海上看燈光秀非常震撼。',rating:'⭐⭐⭐⭐⭐',photo:'遊艇夜景＋煙火＋無人機',food:'船上簡單飲料',tip:'一定要預約＋提早20分鐘集合',badge:'reserve',query:'Yachtholic Busan'},
+    {day:'day1',icon:'🚕',time:'21:00',place:'返回西面',drive:'廣安里 → 西面：約 25–40 分鐘',desc:'遊艇結束後回西面。',rating:'⭐⭐⭐⭐',photo:'西面夜街',food:'便利商店宵夜',tip:'夜間建議搭車',badge:'easy',query:'Seomyeon Busan'},
+    {day:'day1',icon:'🍜',time:'宵夜',place:'松亭三代豬肉湯飯',desc:'Day1 宵夜安排，熱湯很適合收尾。',rating:'⭐⭐⭐⭐⭐',photo:'湯飯近拍',food:'豬肉湯飯、泡菜',tip:'宵夜時段可能仍需等位',badge:'easy',query:'Songjeong 3dae Gukbap Busan'},
+    {day:'day2',icon:'🏛️',time:'整天',place:'慶州一日遊',desc:'韓國古都，文化景點密集。',rating:'⭐⭐⭐⭐⭐',photo:'佛國寺、古城',food:'韓式便當、在地料理',tip:'移動時間長',badge:'reserve',query:'Gyeongju Korea'},
+    {day:'day3',icon:'🎨',time:'10:00',place:'甘川洞文化村',desc:'彩色山城＋小王子拍照景點。',rating:'⭐⭐⭐⭐⭐',photo:'彩色房子、小王子',food:'咖啡、小吃',tip:'坡多需走路',badge:'walk',query:'Gamcheon Culture Village Busan'},
+    {day:'day3',icon:'🌃',time:'晚上',place:'BUSAN X THE SKY',desc:'釜山最高觀景台夜景。',rating:'⭐⭐⭐⭐⭐',photo:'高空夜景',food:'咖啡',tip:'夜晚人多',badge:'easy',query:'Busan X The Sky'},
+    {day:'day4',icon:'🐠',time:'10:00',place:'SEA LIFE 水族館',desc:'親子友善室內景點。',rating:'⭐⭐⭐⭐',photo:'海底隧道',food:'輕食',tip:'假日人多',badge:'easy',query:'SEA LIFE Busan Aquarium'},
+    {day:'day4',icon:'🚆',time:'16:30',place:'膠囊列車',desc:'海岸線絕美景色。',rating:'⭐⭐⭐⭐⭐',photo:'海景列車',food:'附近麵包店',tip:'需預約',badge:'reserve',query:'Haeundae Blue Line Park'},
+    {day:'day5',icon:'✈️',time:'回程',place:'返回機場',desc:'結束旅程。',rating:'⭐⭐⭐',photo:'機場紀念照',food:'機場餐廳',tip:'提早到機場',badge:'easy',query:'Gimhae International Airport'}
+  ].map((x,i)=>({...x,id:'base-'+i}));
+
+  const STORAGE={items:'busan_items_v6',expenses:'busan_expenses_v6',members:'busan_members_v6',profiles:'expense_profiles_v6'};
+  const $=id=>document.getElementById(id);
+  const val=(id,fallback='')=>{const el=$(id);return el?el.value:fallback};
+  const setVal=(id,value)=>{const el=$(id);if(el)el.value=value};
+  const escapeHTML=value=>String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  const safeJson=(key,fallback)=>{try{const value=JSON.parse(localStorage.getItem(key));return value??fallback}catch{return fallback}};
+  const yen=n=>(Math.round(Number(n)||0)).toLocaleString();
+  let items=safeJson(STORAGE.items,BASE_ITEMS);
+  let expenses=safeJson(STORAGE.expenses,[]);
+  let members=safeJson(STORAGE.members,DEFAULT_MEMBERS);
+  if(!Array.isArray(items)||items.length===0)items=BASE_ITEMS.map(x=>({...x}));
+  if(!Array.isArray(members)||members.length===0)members=[...DEFAULT_MEMBERS];
+
+  function save(){localStorage.setItem(STORAGE.items,JSON.stringify(items));localStorage.setItem(STORAGE.expenses,JSON.stringify(expenses));localStorage.setItem(STORAGE.members,JSON.stringify(members));}
+  function getRate(){const n=Number(val('rate',0.025));return n>0?n:0.025;}
+  function toKrw(ntd){return Number(ntd||0)/getRate();}
+  function toNtd(krw){return Number(krw||0)*getRate();}
+  function badgeText(b){return b==='walk'?'🚶‍♂️ 需走路':b==='reserve'?'📌 需預約':'👶 長輩OK'}
+  function badgeClass(b){return b==='walk'?'walk':b==='reserve'?'reserve':'easy'}
+  function mapUrl(q,type){const encoded=encodeURIComponent(q||'Busan');return type==='naver'?`https://map.naver.com/p/search/${encoded}`:`https://www.google.com/maps/search/?api=1&query=${encoded}`;}
+  function createNode(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;}
+
+  function renderTimeline(){const root=$('timeline');if(!root)return;root.innerHTML='';Object.entries(DAY_INFO).forEach(([day,[title,date]])=>{const card=createNode('article','day-card');card.id=day;const head=createNode('div','day-head');head.append(createNode('h2','',title),createNode('span','date',date));card.appendChild(head);const spots=createNode('div','spots');items.filter(x=>x.day===day).forEach(item=>spots.appendChild(createSpot(item)));card.appendChild(spots);root.appendChild(card);});}
+  function createSpot(item){const el=createNode('div','spot');const del=createNode('button','delete','×');del.type='button';del.addEventListener('click',()=>deleteTrip(item.id));const icon=createNode('div','icon',item.icon||'📍');const body=createNode('div');body.append(createNode('div','time',item.time||''),createNode('div','place',item.place||''));if(item.drive)body.appendChild(createNode('div','drive','🚗 '+item.drive));if(item.rating)body.appendChild(createNode('div','guide-line','⭐ 推薦指數：'+item.rating));body.appendChild(createNode('p','muted',item.desc||''));if(item.photo)body.appendChild(createNode('div','guide-line','📸 拍照重點：'+item.photo));if(item.food)body.appendChild(createNode('div','guide-line','🍽️ 必吃推薦：'+item.food));if(item.tip)body.appendChild(createNode('div','guide-line','⚠️ 注意事項：'+item.tip));const badges=createNode('div','badge-row');badges.appendChild(createNode('span',`badge ${badgeClass(item.badge)}`,badgeText(item.badge)));const map=createNode('div','map');const google=createNode('a','', 'Google Maps');google.target='_blank';google.href=mapUrl(item.query||item.place,'google');const naver=createNode('a','', 'Naver');naver.target='_blank';naver.href=mapUrl(item.query||item.place,'naver');map.append(google,naver);body.append(badges,map);el.append(del,icon,body);return el;}
+  function deleteTrip(id){if(confirm('確定刪除此行程？')){items=items.filter(x=>x.id!==id);save();renderTimeline();}}
+  function addTripItem(){const place=val('tripPlace').trim();if(!place)return alert('請輸入景點 / 餐廳');const day=val('tripDay','day0');items.push({id:'custom-'+Date.now(),day,icon:val('tripIcon','📍')||'📍',time:val('tripTime'),place,drive:val('tripDrive'),desc:val('tripDesc'),rating:val('tripRating','⭐⭐⭐⭐')||'⭐⭐⭐⭐',photo:val('tripPhoto'),food:val('tripFood'),tip:val('tripTip'),badge:val('tripBadge','easy'),query:val('tripQuery')||place});save();renderTimeline();['tripPlace','tripDesc','tripTime','tripDrive','tripQuery','tripRating','tripPhoto','tripFood','tripTip'].forEach(id=>setVal(id,''));setVal('tripIcon','📍');const target=$(day);if(target)target.scrollIntoView({behavior:'smooth'});}
+
+  function normalizeExpense(e){if(e&&typeof e.ntd==='number'&&typeof e.krw==='number')return e;const amount=Number(e?.amount||e?.originalAmount||0);return {...e,id:e?.id||('e-'+Date.now()),member:e?.member||'未指定',ntd:amount,krw:toKrw(amount),currency:e?.currency||'NTD',originalAmount:amount};}
+  function addExpense(){const name=val('expenseName').trim();const amount=Number(val('expenseAmount'))||0;if(!name||!amount)return alert('請填完整花費');const currency=val('expenseCurrency','KRW');const ntd=currency==='KRW'?toNtd(amount):amount;const krw=currency==='KRW'?amount:toKrw(amount);expenses.push({id:'e-'+Date.now(),day:val('expenseDay','day0'),member:val('expenseMember','未指定')||'未指定',category:val('expenseCategory','其他'),name,currency,originalAmount:amount,ntd,krw});setVal('expenseName','');setVal('expenseAmount','');save();renderExpenses();calcBudget();}
+  function addMobileExpense(){const name=val('mExpenseName').trim();const amount=Number(val('mExpenseAmount'))||0;if(!name||!amount)return alert('請填完整花費');const currency=val('mExpenseCurrency','KRW');const ntd=currency==='KRW'?toNtd(amount):amount;const krw=currency==='KRW'?amount:toKrw(amount);expenses.push({id:'e-'+Date.now(),day:val('mExpenseDay','day0'),member:val('mExpenseMember','未指定')||'未指定',category:val('mExpenseCategory','其他'),name,currency,originalAmount:amount,ntd,krw});setVal('mExpenseName','');setVal('mExpenseAmount','');save();renderExpenses();calcBudget();closeSheet();const target=$('addExpense');if(target)target.scrollIntoView({behavior:'smooth'});}
+  function deleteExpense(id){expenses=expenses.filter(e=>e.id!==id);save();renderExpenses();calcBudget();}
+  function resetExpenses(){if(confirm('確定清空所有花費？')){expenses=[];save();renderExpenses();calcBudget();}}
+  function renderExpenses(){expenses=expenses.map(normalizeExpense);const list=$('expenseList');if(!list)return;list.innerHTML='';expenses.slice().reverse().forEach(e=>{const row=createNode('div','expense-row');const left=createNode('div');left.append(createNode('b','',`${DAY_INFO[e.day]?.[0]?.split('｜')[0]||e.day}｜${e.member||'未指定'}｜${e.category||'其他'}`),document.createElement('br'),createNode('span','muted',`${e.name||''}｜原始輸入：${yen(e.originalAmount)} ${e.currency||'NTD'}`));const right=createNode('div');right.append(createNode('b','',`${yen(e.ntd)} NTD`),document.createElement('br'),createNode('span','muted',`≈ ${yen(e.krw)} KRW`),document.createElement('br'));const btn=createNode('button','btn red','刪除');btn.type='button';btn.addEventListener('click',()=>deleteExpense(e.id));right.appendChild(btn);row.append(left,right);list.appendChild(row);});save();}
+
+  function calcBudget(){renderCategoryStats();renderMemberStats();const total=['hotelBudget','foodBudget','transportBudget','ticketBudget','shoppingBudget'].reduce((s,id)=>s+(Number(val(id))||0),0);const actual=expenses.reduce((s,e)=>s+(Number(e.ntd)||0),0);const people=Number(val('people',1))||1;const remainingNtd=total-actual;const perNtd=actual/people;const setText=(id,text)=>{const el=$(id);if(el)el.textContent=text};setText('totalBudget',yen(total));setText('totalBudgetKrw',yen(toKrw(total))+' KRW');setText('actualTotal',yen(actual));setText('actualTotalKrw',yen(toKrw(actual))+' KRW');setText('remaining',yen(remainingNtd));setText('remainingKrw',yen(toKrw(remainingNtd))+' KRW');setText('perPerson',yen(perNtd));setText('perPersonKrw',yen(toKrw(perNtd))+' KRW');setText('rateText',getRate());renderDailySummary();}
+  function renderDailySummary(){const wrap=$('dailySummary');if(!wrap)return;wrap.innerHTML='';Object.keys(DAY_INFO).forEach(day=>{const sum=expenses.filter(e=>e.day===day).reduce((s,e)=>s+(Number(e.ntd)||0),0);const box=createNode('div','summary-box');box.innerHTML=`${escapeHTML(DAY_INFO[day][0].split('｜')[0])}<br><b>${yen(sum)}</b> NTD<br><span class="muted">≈ ${yen(toKrw(sum))} KRW</span>`;wrap.appendChild(box);});}
+  function renderCategoryStats(){const wrap=$('categoryStats');if(!wrap)return;wrap.innerHTML='';const map={};expenses.forEach(e=>{const cat=e.category||'其他';map[cat]=(map[cat]||0)+(Number(e.ntd)||0);});const total=Object.values(map).reduce((a,b)=>a+b,0)||1;Object.entries(map).sort((a,b)=>b[1]-a[1]).forEach(([cat,sum])=>{const pct=Math.round((sum/total)*100);const box=createNode('div','summary-box');box.innerHTML=`${escapeHTML(cat)}<br><b>${yen(sum)}</b> NTD<br><span class="muted">${pct}%</span>`;wrap.appendChild(box);});}
+  function renderMemberStats(){const wrap=$('memberStats');if(!wrap)return;wrap.innerHTML='';const map={};expenses.forEach(e=>{const member=e.member||'未指定';map[member]=(map[member]||0)+(Number(e.ntd)||0);});Object.entries(map).sort((a,b)=>b[1]-a[1]).forEach(([member,sum])=>{const box=createNode('div','summary-box');box.innerHTML=`${escapeHTML(member)}<br><b>${yen(sum)}</b> NTD<br><span class="muted">≈ ${yen(toKrw(sum))} KRW</span>`;wrap.appendChild(box);});}
+  function renderMembers(){[$('expenseMember'),$('mExpenseMember')].filter(Boolean).forEach(select=>{select.innerHTML='<option value="">選擇成員</option>';members.forEach(m=>{const opt=document.createElement('option');opt.value=m;opt.textContent=m;select.appendChild(opt);});});}
+  function getProfiles(){return safeJson(STORAGE.profiles,{});}
+  function updateProfileSelect(){const select=$('profileSelect');if(!select)return;const current=select.value;const all=getProfiles();select.innerHTML='<option value="">選擇已有存檔</option>';Object.keys(all).sort().forEach(name=>{const opt=document.createElement('option');opt.value=name;opt.textContent=name;select.appendChild(opt);});if(all[current])select.value=current;}
+  function saveProfile(){const name=val('saveName').trim();if(!name)return alert('請輸入存檔名稱');const all=getProfiles();all[name]=expenses;localStorage.setItem(STORAGE.profiles,JSON.stringify(all));updateProfileSelect();setVal('profileSelect',name);alert('已存檔：'+name);}
+  function loadProfile(){const name=val('profileSelect')||val('saveName').trim();if(!name)return alert('請先從下拉選單選擇存檔');const all=getProfiles();if(!all[name])return alert('找不到此存檔');expenses=all[name].map(normalizeExpense);setVal('saveName',name);save();renderExpenses();calcBudget();alert('已載入：'+name);}
+  function deleteProfile(){const name=val('profileSelect');if(!name)return alert('請先選擇要刪除的存檔');if(!confirm('確定刪除存檔：'+name+'？'))return;const all=getProfiles();delete all[name];localStorage.setItem(STORAGE.profiles,JSON.stringify(all));updateProfileSelect();alert('已刪除：'+name);}
+  function addMobileTripItem(){const place=val('mTripPlace').trim();if(!place)return alert('請輸入景點 / 餐廳');const day=val('mTripDay','day0');items.push({id:'custom-'+Date.now(),day,icon:val('mTripIcon','📍')||'📍',time:val('mTripTime'),place,drive:val('mTripDrive'),desc:val('mTripDesc'),rating:'⭐⭐⭐⭐',photo:'',food:'',tip:'',badge:val('mTripBadge','easy'),query:val('mTripQuery')||place});save();renderTimeline();['mTripPlace','mTripDesc','mTripTime','mTripDrive','mTripQuery'].forEach(id=>setVal(id,''));setVal('mTripIcon','📍');closeSheet();const target=$(day);if(target)target.scrollIntoView({behavior:'smooth'});}
+  function resetAll(){if(confirm('確定恢復原始行程並清空花費？')){items=BASE_ITEMS.map(x=>({...x}));expenses=[];save();renderTimeline();renderExpenses();calcBudget();}}
+  function exportHTML(){const blob=new Blob([document.documentElement.outerHTML],{type:'text/html;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='busan-family-trip-budget-no-translate.html';a.click();URL.revokeObjectURL(a.href);}
+  function openSheet(type='expense'){const b=$('sheetBackdrop'),s=$('appSheet');if(b)b.classList.add('show');if(s)s.classList.add('show');switchSheet(type);}
+  function closeSheet(){const b=$('sheetBackdrop'),s=$('appSheet');if(b)b.classList.remove('show');if(s)s.classList.remove('show');}
+  function switchSheet(type){const exp=type==='expense';[['expenseTab',exp],['tripTab',!exp],['expenseSheet',exp],['tripSheet',!exp]].forEach(([id,on])=>{const el=$(id);if(el)el.classList.toggle('active',on);});}
+  function on(id,event,handler){const el=$(id);if(el)el.addEventListener(event,handler);}
+  function bindEvents(){
+    on('krwInput','input',()=>setVal('ntdInput',Math.round(toNtd(Number(val('krwInput'))||0))));
+    on('ntdInput','input',()=>setVal('krwInput',Math.round(toKrw(Number(val('ntdInput'))||0))));
+    document.querySelectorAll('.budgetInput,#people,#rate').forEach(el=>el.addEventListener('input',calcBudget));
+    on('addExpenseBtn','click',addExpense);on('resetExpensesBtn','click',resetExpenses);on('addTripBtn','click',addTripItem);on('exportBtn','click',exportHTML);on('resetAllBtn','click',resetAll);on('saveProfileBtn','click',saveProfile);on('loadProfileBtn','click',loadProfile);on('deleteProfileBtn','click',deleteProfile);on('fabBtn','click',()=>openSheet('expense'));on('bottomExpenseBtn','click',()=>openSheet('expense'));on('bottomTripBtn','click',()=>openSheet('trip'));on('sheetBackdrop','click',closeSheet);on('expenseTab','click',()=>switchSheet('expense'));on('tripTab','click',()=>switchSheet('trip'));on('closeSheetBtn1','click',closeSheet);on('closeSheetBtn2','click',closeSheet);on('addMobileExpenseBtn','click',addMobileExpense);on('addMobileTripBtn','click',addMobileTripItem);
+  }
+  bindEvents();updateProfileSelect();renderMembers();renderTimeline();renderExpenses();calcBudget();
+})();
+</script>
+</body>
+</html>
